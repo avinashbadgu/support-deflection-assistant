@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Sources · Support Assistant{% endblock %}
+{% block content %}
+<section class="page sources-page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Sources</h1>
+      <p class="page-sub">Everything currently indexed in the vector store, grouped by source URL.</p>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi-mini"><div class="kpi-mini-label">Docs</div><div class="kpi-mini-value" id="t-docs">—</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">Chunks</div><div class="kpi-mini-value" id="t-chunks">—</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">Chars</div><div class="kpi-mini-value" id="t-chars">—</div></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input type="text" class="search-input" id="search" placeholder="Filter by title or URL…">
+  </div>
+
+  <div class="panel">
+    <table class="data-table">
+      <thead>
+        <tr><th style="width:60%">Title</th><th>URL</th><th class="num">Chunks</th><th class="num">Chars</th></tr>
+      </thead>
+      <tbody id="sources-tbody">
+        <tr><td colspan="4" class="muted">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let rows = [];
+function render(filter) {
+  const f = (filter || "").toLowerCase();
+  const tbody = document.getElementById("sources-tbody");
+  const matches = rows.filter(r =>
+    !f || (r.title || "").toLowerCase().includes(f) || (r.url || "").toLowerCase().includes(f)
+  );
+  if (matches.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="muted">No matching sources.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = matches.map(r => {
+    const t = (r.title || "").replace(/[<>"&]/g, c => ({"<":"&lt;",">":"&gt;","\"":"&quot;","&":"&amp;"}[c])) || "<em class='muted'>(untitled)</em>";
+    return `<tr>
+      <td>${t}</td>
+      <td><a href="${r.url}" target="_blank" rel="noopener" class="link-soft">${r.url}</a></td>
+      <td class="num mono">${r.chunks}</td>
+      <td class="num mono">${r.chars.toLocaleString()}</td>
+    </tr>`;
+  }).join("");
+}
+
+async function load() {
+  const r = await fetch("/api/sources");
+  if (!r.ok) { toast("Failed to load sources", "bad"); return; }
+  const d = await r.json();
+  document.getElementById("t-docs").textContent   = d.total_docs;
+  document.getElementById("t-chunks").textContent = d.total_chunks;
+  document.getElementById("t-chars").textContent  = d.total_chars.toLocaleString();
+  rows = d.sources || [];
+  render("");
+}
+
+document.getElementById("search").addEventListener("input", (e) => render(e.target.value));
+load();
+</script>
+{% endblock %}
