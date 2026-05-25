@@ -1,0 +1,56 @@
+[
+  {
+    "preset": "baseline-dense",
+    "settings": {
+      "use_hybrid": false,
+      "use_reranker": false,
+      "reranker_kind": "none"
+    },
+    "recall_at_k": 1.0,
+    "abstention_accuracy": 1.0,
+    "precision_abstain": 0.0,
+    "recall_abstain": 0.0,
+    "faithfulness_mean": null,
+    "hallucination_rate": null,
+    "latency_p50_ms": 7084.17229999759,
+    "latency_p95_ms": 8015.802600001916,
+    "cost_mean_usd": 0.0007528139999999999,
+    "by_category": [
+      {
+        "category": "direct_retrieval",
+        "n": 5,
+        "recall_at_k_mean": 1.0,
+        "abstention_accuracy": 1.0,
+        "faithfulness_mean": null,
+        "latency_p95_ms": 8015.802600001916
+      }
+    ]
+  },
+  {
+    "preset": "hybrid",
+    "settings": {
+      "use_hybrid": true,
+      "use_reranker": false,
+      "reranker_kind": "none"
+    },
+    "recall_at_k": 1.0,
+    "abstention_accuracy": 1.0,
+    "precision_abstain": 0.0,
+    "recall_abstain": 0.0,
+    "faithfulness_mean": null,
+    "hallucination_rate": null,
+    "latency_p50_ms": 7484.147799994389,
+    "latency_p95_ms": 8117.27054000221,
+    "cost_mean_usd": 0.000856118,
+    "by_category": [
+      {
+        "category": "direct_retrieval",
+        "n": 5,
+        "recall_at_k_mean": 1.0,
+        "abstention_accuracy": 1.0,
+        "faithfulness_mean": null,
+        "latency_p95_ms": 8117.27054000221
+      }
+    ]
+  }
+]
