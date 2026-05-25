@@ -1,0 +1,112 @@
+{
+  "config_tag": "compare-baseline-dense",
+  "n_cases": 3,
+  "recall_at_k_mean": 1.0,
+  "abstention": {
+    "accuracy": 1.0,
+    "precision_abstain": 0.0,
+    "recall_abstain": 0.0,
+    "tp": 0,
+    "tn": 3,
+    "fp": 0,
+    "fn": 0
+  },
+  "faithfulness_mean": null,
+  "hallucination_rate": null,
+  "latency_p50_ms": 7766.270800006168,
+  "latency_p95_ms": 12682.983219999005,
+  "cost_total_usd": 0.00284218,
+  "cost_mean_usd": 0.0009473933333333334,
+  "settings_snapshot": {
+    "embed_model": "text-embedding-3-small",
+    "gen_model": "gpt-4o-mini",
+    "judge_model": "gpt-4o-mini",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 8,
+    "rerank_top_n": 5,
+    "use_reranker": false,
+    "reranker_kind": "none",
+    "use_cache": true,
+    "use_hybrid": false,
+    "bm25_top_k": 20,
+    "rrf_k": 60,
+    "abstain_min_score": 0.35,
+    "abstain_use_judge": true
+  },
+  "by_category": [
+    {
+      "category": "direct_retrieval",
+      "n": 3,
+      "recall_at_k_mean": 1.0,
+      "abstention_accuracy": 1.0,
+      "faithfulness_mean": null,
+      "latency_p95_ms": 12682.983219999005
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "d001",
+      "category": "direct_retrieval",
+      "question": "How do I issue a partial refund for a charge?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide clear instructions on how to issue a partial refund using the Dashboard, including the steps to enter a different refund amount.",
+      "answer": "To issue a partial refund for a charge using the Stripe Dashboard, follow these steps:\n\n1. Find the payment you want to refund in the Payments page.\n2. Click the overflow menu to the right of the payment and select \"Refund payment.\"\n3. By default, a full refund is issued. For a partial refund, enter a different refund amount.\n4. Select a reason for the refund and click \"Refund.\"\n\nYou can also issue a partial refund from the payment's details page [2].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 13229.28459999821,
+      "cost_usd": 0.0011003200000000001
+    },
+    {
+      "case_id": "d002",
+      "category": "direct_retrieval",
+      "question": "What does a PaymentIntent represent and what are its main statuses?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide information about the PaymentIntent, including its statuses and how they relate to payment outcomes.",
+      "answer": "A PaymentIntent represents a payment process in Stripe, encapsulating details about the transaction such as the amount, currency, and supported payment methods. It is typically associated with a single shopping cart or customer session and can track multiple payment attempts for that session [2], [3].\n\nThe main statuses of a PaymentIntent include:\n1. **succeeded** - Payment was successful.\n2. **requires_payment_method** - Payment failed due to a card error.\n3. **requires_action** - Payment failed due to authentication issues [1].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/payments/payment-intents"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 7766.270800006168,
+      "cost_usd": 0.0008644799999999999
+    },
+    {
+      "case_id": "d003",
+      "category": "direct_retrieval",
+      "question": "How does Stripe verify the signature of an incoming webhook?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide detailed information on how to verify the signature of an incoming webhook using the endpoint's secret and the Stripe-Signature header.",
+      "answer": "Stripe verifies the signature of an incoming webhook by including a signature in the `Stripe-Signature` header. To verify this signature, you can use Stripe's official libraries or perform the verification manually. The process involves providing the event payload, the `Stripe-Signature` header, and the endpoint's secret. If the verification fails, an error is returned. It's important to ensure that the raw body of the request is used for verification, as any manipulation can cause the verification to fail [1][3][5].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 6395.306899998104,
+      "cost_usd": 0.00087738
+    }
+  ]
+}
