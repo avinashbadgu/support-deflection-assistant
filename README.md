@@ -60,12 +60,6 @@ after running the compare. Threshold-sweep curve: `support-assistant eval --swee
 
 ---
 
-## Status
-
-**Pre-launch.** Built, 60 tests passing. The benchmark table above is being filled
-by a live run. Once populated, this repo crosses from *"architecture writeup"* to
-*"evaluation-driven retrieval engineering with measured tradeoffs"*.
-
 ## Quick start
 
 ```powershell
@@ -287,27 +281,6 @@ truth for every choice, and the modules above are thin enough to step through in
 a debugger or read aloud in a code review.
 
 ---
-
-## Publish checklist
-
-**Repo description** (paste into GitHub "About"):
-
-> Evaluation-driven RAG support assistant over a curated Stripe documentation subset. Two-gate abstention, hybrid retrieval (BM25 + dense + RRF), cross-encoder vs LLM reranker A/B, 114-case categorized eval harness with per-category metrics, threshold sweeps, and failure analysis.
-
-**Repo topics:**
-
-```
-rag retrieval-augmented-generation llm abstention hallucination
-evaluation hybrid-retrieval bm25 reranking fastapi openai
-chromadb prefect ai-engineering
-```
-
-**Pre-publish:**
-- [ ] Benchmark table populated with real numbers from `support-assistant compare`
-- [ ] One failure case picked from `_failures.md` to talk about in the LinkedIn post
-- [ ] 30-sec screen recording saved as `docs/demo.gif`
-- [ ] `LICENSE` file (MIT)
-- [ ] `git init && git push`, set the About / Topics fields above, pin to profile
 
 ## License
 
