@@ -1,0 +1,920 @@
+[
+  {
+    "id": "d001",
+    "category": "direct_retrieval",
+    "question": "How do I issue a partial refund for a charge?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Pass an `amount` (in the smallest currency unit) on the refund object that is less than the original charge amount. Omit `amount` for a full refund."
+  },
+  {
+    "id": "d002",
+    "category": "direct_retrieval",
+    "question": "What does a PaymentIntent represent and what are its main statuses?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A PaymentIntent represents a payment lifecycle. Key statuses include requires_payment_method, requires_confirmation, requires_action, processing, succeeded, and canceled."
+  },
+  {
+    "id": "d003",
+    "category": "direct_retrieval",
+    "question": "How does Stripe verify the signature of an incoming webhook?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Stripe sends a Stripe-Signature header. You compute an HMAC-SHA256 of the timestamp + '.' + payload using your endpoint secret and compare it to the signature; reject if it doesn't match or the timestamp is too old."
+  },
+  {
+    "id": "d004",
+    "category": "direct_retrieval",
+    "question": "What is Stripe Radar and what does it do?",
+    "expected_source_urls": ["https://docs.stripe.com/radar"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Radar is Stripe's fraud-prevention product that uses machine learning to score payments and block or review high-risk transactions, with configurable rules."
+  },
+  {
+    "id": "d005",
+    "category": "direct_retrieval",
+    "question": "How do disputes work on Stripe and what should I do when I receive one?",
+    "expected_source_urls": ["https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "When a cardholder disputes a charge, Stripe notifies you; you have a deadline to submit evidence. The disputed amount and a fee are debited; if you win, the amount is returned."
+  },
+  {
+    "id": "d006",
+    "category": "direct_retrieval",
+    "question": "What is Stripe Connect used for?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Connect is for platforms and marketplaces that route payments to multiple sellers/service providers; it handles onboarding, identity, payouts, and compliance across connected accounts."
+  },
+  {
+    "id": "d007",
+    "category": "direct_retrieval",
+    "question": "How are payouts scheduled by default?",
+    "expected_source_urls": ["https://docs.stripe.com/payouts"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Payouts default to a rolling daily or weekly schedule depending on country and business type; you can configure the schedule in the Dashboard or via the API."
+  },
+  {
+    "id": "d008",
+    "category": "direct_retrieval",
+    "question": "What does Stripe Identity verify and how does the flow work?",
+    "expected_source_urls": ["https://docs.stripe.com/identity"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Identity verifies a user's government-issued ID and selfie. You create a VerificationSession, the user completes a hosted flow, and you receive a result via webhook."
+  },
+  {
+    "id": "d009",
+    "category": "direct_retrieval",
+    "question": "What payment methods can Stripe process?",
+    "expected_source_urls": ["https://docs.stripe.com/payments"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Cards, wallets (Apple Pay, Google Pay, Link), bank debits (ACH, SEPA, BACS), bank redirects (iDEAL, Bancontact), BNPL (Klarna, Afterpay), and others depending on country."
+  },
+  {
+    "id": "d010",
+    "category": "direct_retrieval",
+    "question": "How do I accept a one-time payment using Stripe Elements on the web?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/accept-a-payment"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Create a PaymentIntent server-side, render the Payment Element with its client_secret, call stripe.confirmPayment on submit, and handle the redirect/return."
+  },
+  {
+    "id": "d011",
+    "category": "direct_retrieval",
+    "question": "Can I issue multiple refunds against the same charge?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — you can issue multiple partial refunds, but the cumulative amount cannot exceed the original charge amount."
+  },
+  {
+    "id": "d012",
+    "category": "direct_retrieval",
+    "question": "What happens when a subscription invoice payment fails?",
+    "expected_source_urls": ["https://docs.stripe.com/billing/invoices/overview", "https://docs.stripe.com/billing/subscriptions/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "The invoice moves to 'open' / past_due; depending on retry settings the payment may be retried; the subscription can transition to past_due, unpaid, or canceled."
+  },
+  {
+    "id": "d013",
+    "category": "direct_retrieval",
+    "question": "What is a connected account in Stripe Connect?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A connected account represents an individual or business that receives payments through a Connect platform. Types include Standard, Express, and Custom."
+  },
+  {
+    "id": "d014",
+    "category": "direct_retrieval",
+    "question": "Does Stripe Radar require configuration or does it work out of the box?",
+    "expected_source_urls": ["https://docs.stripe.com/radar"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Radar is enabled by default with built-in ML rules. You can add custom rules, allow/block lists, and review queues for finer control."
+  },
+  {
+    "id": "d015",
+    "category": "direct_retrieval",
+    "question": "How do I respond to a dispute and submit evidence?",
+    "expected_source_urls": ["https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "From the Dashboard or via the Disputes API, submit evidence (receipts, communications, shipping info) before the deadline. Stripe forwards it to the issuing bank."
+  },
+  {
+    "id": "d016",
+    "category": "direct_retrieval",
+    "question": "What does the 'requires_action' status mean on a PaymentIntent?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "The payment needs additional steps from the customer, typically 3D Secure authentication. Client uses next_action to complete it."
+  },
+  {
+    "id": "d017",
+    "category": "direct_retrieval",
+    "question": "How can I receive webhook events for new charges?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Create a webhook endpoint in the Dashboard or API, subscribe to charge.succeeded / charge.failed events, and verify the Stripe-Signature on each delivery."
+  },
+  {
+    "id": "d018",
+    "category": "direct_retrieval",
+    "question": "Does Stripe Billing support recurring subscriptions?",
+    "expected_source_urls": ["https://docs.stripe.com/billing/subscriptions/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — Stripe Billing supports recurring subscriptions with configurable intervals (daily, weekly, monthly, yearly), proration, trials, and metered usage."
+  },
+  {
+    "id": "d019",
+    "category": "direct_retrieval",
+    "question": "What information do I need to onboard a connected account?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Identity, business information, bank account, and (depending on country) tax IDs. Stripe-hosted onboarding (Express/Standard) collects this for you."
+  },
+  {
+    "id": "d020",
+    "category": "direct_retrieval",
+    "question": "How do I capture a previously authorized charge?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "POST /v1/charges/{id}/capture. Optionally specify amount_to_capture for partial capture (within authorization window)."
+  },
+  {
+    "id": "d021",
+    "category": "direct_retrieval",
+    "question": "What is the difference between a dispute and a refund?",
+    "expected_source_urls": ["https://docs.stripe.com/disputes", "https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A refund is initiated by the merchant; a dispute (chargeback) is initiated by the cardholder via their bank. Disputes carry a fee and involve evidence submission."
+  },
+  {
+    "id": "d022",
+    "category": "direct_retrieval",
+    "question": "Can I customize when payouts happen?",
+    "expected_source_urls": ["https://docs.stripe.com/payouts"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — set the payout schedule (daily, weekly, monthly, manual) in the Dashboard or via the Accounts API."
+  },
+  {
+    "id": "d023",
+    "category": "direct_retrieval",
+    "question": "What is a VerificationSession in Stripe Identity?",
+    "expected_source_urls": ["https://docs.stripe.com/identity"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A VerificationSession represents one user's identity verification attempt. It progresses through requires_input → processing → verified or canceled, with results delivered via webhook."
+  },
+  {
+    "id": "d024",
+    "category": "direct_retrieval",
+    "question": "Does Stripe support Apple Pay and Google Pay?",
+    "expected_source_urls": ["https://docs.stripe.com/payments"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — both are supported as wallet payment methods via the Payment Element or dedicated APIs."
+  },
+  {
+    "id": "d025",
+    "category": "direct_retrieval",
+    "question": "How long do I have to respond to a dispute?",
+    "expected_source_urls": ["https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Deadlines vary by card network and dispute reason but are typically 7-21 days. Stripe surfaces the specific deadline on the dispute object."
+  },
+  {
+    "id": "d026",
+    "category": "direct_retrieval",
+    "question": "Can I issue a refund through the Stripe Dashboard?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — open the payment, click the overflow menu, select 'Refund payment'. You can choose a full or partial amount."
+  },
+  {
+    "id": "d027",
+    "category": "direct_retrieval",
+    "question": "What is a trial period in a Stripe subscription?",
+    "expected_source_urls": ["https://docs.stripe.com/billing/subscriptions/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A trial lets a customer use the subscription without being billed for a set period. Set trial_period_days or trial_end at creation. Card may or may not be required upfront."
+  },
+  {
+    "id": "d028",
+    "category": "direct_retrieval",
+    "question": "What is the Payment Element?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/accept-a-payment"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A pre-built UI component (JS) that renders the appropriate payment-method inputs for the customer's region/currency, handling 3D Secure and fallback flows."
+  },
+  {
+    "id": "d029",
+    "category": "direct_retrieval",
+    "question": "How do I test webhooks during development?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks", "https://docs.stripe.com/testing"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Use the Stripe CLI (`stripe listen --forward-to`) to forward live webhook events to a local endpoint, or trigger specific test events with `stripe trigger`."
+  },
+  {
+    "id": "d030",
+    "category": "direct_retrieval",
+    "question": "Does Stripe Identity work on mobile?",
+    "expected_source_urls": ["https://docs.stripe.com/identity"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — the hosted verification flow works in mobile browsers, and Stripe provides SDKs for iOS and Android for an in-app flow."
+  },
+
+  {
+    "id": "a001",
+    "category": "exact_api",
+    "question": "How do I list all customers using the Stripe API?",
+    "expected_source_urls": ["https://docs.stripe.com/api/customers"],
+    "expected_abstain": false,
+    "gold_answer_summary": "GET /v1/customers returns a paginated list; use `limit` (up to 100) and `starting_after` for cursor pagination."
+  },
+  {
+    "id": "a002",
+    "category": "exact_api",
+    "question": "What does the charge object's `captured` field mean?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "`captured` indicates whether the charge has been captured (funds transferred). Authorization-only charges have captured=false until you capture them."
+  },
+  {
+    "id": "a003",
+    "category": "exact_api",
+    "question": "Which test card number simulates a successful payment in test mode?",
+    "expected_source_urls": ["https://docs.stripe.com/testing"],
+    "expected_abstain": false,
+    "gold_answer_summary": "4242 4242 4242 4242 is the canonical successful test card."
+  },
+  {
+    "id": "a004",
+    "category": "exact_api",
+    "question": "What test card triggers an authentication_required (3D Secure) response?",
+    "expected_source_urls": ["https://docs.stripe.com/testing"],
+    "expected_abstain": false,
+    "gold_answer_summary": "4000 0027 6000 3184 (and variants) triggers authentication_required."
+  },
+  {
+    "id": "a005",
+    "category": "exact_api",
+    "question": "What test card simulates an insufficient_funds decline?",
+    "expected_source_urls": ["https://docs.stripe.com/testing"],
+    "expected_abstain": false,
+    "gold_answer_summary": "4000 0000 0000 9995 triggers an insufficient_funds decline."
+  },
+  {
+    "id": "a006",
+    "category": "exact_api",
+    "question": "What HTTP method does the Refund creation endpoint use?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "POST /v1/refunds (or POST /v1/charges/{id}/refunds for the legacy nested form)."
+  },
+  {
+    "id": "a007",
+    "category": "exact_api",
+    "question": "What is the `customer` field on the charge object?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "The ID of the Customer the charge was made for, if attached. Null if the charge wasn't attached to a customer."
+  },
+  {
+    "id": "a008",
+    "category": "exact_api",
+    "question": "What header does Stripe use to send webhook signatures?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Stripe-Signature. It contains a timestamp and one or more signatures keyed v1=…"
+  },
+  {
+    "id": "a009",
+    "category": "exact_api",
+    "question": "What is the `4000 0000 0000 0002` test card used for?",
+    "expected_source_urls": ["https://docs.stripe.com/testing"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Triggers a generic card_declined response."
+  },
+  {
+    "id": "a010",
+    "category": "exact_api",
+    "question": "What is the maximum value for `limit` when listing customers?",
+    "expected_source_urls": ["https://docs.stripe.com/api/customers"],
+    "expected_abstain": false,
+    "gold_answer_summary": "100. Default is 10."
+  },
+  {
+    "id": "a011",
+    "category": "exact_api",
+    "question": "How do I retrieve a specific charge by its ID?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "GET /v1/charges/{CHARGE_ID}"
+  },
+  {
+    "id": "a012",
+    "category": "exact_api",
+    "question": "How do I cancel a PaymentIntent before it is captured?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "POST /v1/payment_intents/{id}/cancel. Allowed when the PI is in requires_payment_method / requires_capture / requires_confirmation / requires_action / processing."
+  },
+  {
+    "id": "a013",
+    "category": "exact_api",
+    "question": "How do I attach metadata to a Stripe charge?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Pass a `metadata` map of arbitrary key/value strings at create or update time."
+  },
+  {
+    "id": "a014",
+    "category": "exact_api",
+    "question": "What event is fired when a payment succeeds via webhook?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks"],
+    "expected_abstain": false,
+    "gold_answer_summary": "`charge.succeeded` (for the underlying Charge) and/or `payment_intent.succeeded` (for the PaymentIntent flow)."
+  },
+  {
+    "id": "a015",
+    "category": "exact_api",
+    "question": "How do I make a Stripe API request idempotent?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Send a unique `Idempotency-Key` header. Stripe returns the original response for duplicates within the retention window."
+  },
+  {
+    "id": "a016",
+    "category": "exact_api",
+    "question": "Which field tells me whether a charge was refunded?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "`refunded` (boolean — true if fully refunded). For partial refunds inspect `amount_refunded` versus `amount`."
+  },
+  {
+    "id": "a017",
+    "category": "exact_api",
+    "question": "What's the API path for creating a Customer?",
+    "expected_source_urls": ["https://docs.stripe.com/api/customers"],
+    "expected_abstain": false,
+    "gold_answer_summary": "POST /v1/customers"
+  },
+  {
+    "id": "a018",
+    "category": "exact_api",
+    "question": "How do I delete a Customer via the API?",
+    "expected_source_urls": ["https://docs.stripe.com/api/customers"],
+    "expected_abstain": false,
+    "gold_answer_summary": "DELETE /v1/customers/{CUSTOMER_ID}. Deletes the customer permanently."
+  },
+  {
+    "id": "a019",
+    "category": "exact_api",
+    "question": "What format is the `created` timestamp on a charge?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Unix epoch seconds (integer)."
+  },
+  {
+    "id": "a020",
+    "category": "exact_api",
+    "question": "How do I supply payment_method_types on a PaymentIntent?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Pass `payment_method_types` as an array (e.g. [\"card\"]). Or rely on automatic_payment_methods to let Stripe pick."
+  },
+  {
+    "id": "a021",
+    "category": "exact_api",
+    "question": "What is the response status for a successful refund?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "The Refund object has status 'succeeded' (other states: pending, failed, canceled)."
+  },
+  {
+    "id": "a022",
+    "category": "exact_api",
+    "question": "How do I create a charge against an existing customer's default card?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "POST /v1/charges with `customer` set; Stripe uses the customer's default source / payment method."
+  },
+
+  {
+    "id": "m001",
+    "category": "multi_hop",
+    "question": "How are subscription invoices generated and finalized?",
+    "expected_source_urls": ["https://docs.stripe.com/billing/invoices/overview", "https://docs.stripe.com/billing/subscriptions/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Subscriptions generate invoices at each billing cycle; invoices move through draft → open → paid (or uncollectible/void). Invoices can be auto-advanced and auto-charged."
+  },
+  {
+    "id": "m002",
+    "category": "multi_hop",
+    "question": "What is the difference between a Charge and a PaymentIntent?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents", "https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "PaymentIntent is the modern, SCA-aware lifecycle object that may produce one or more Charges. Charges are the legacy direct API; new integrations should use PaymentIntents."
+  },
+  {
+    "id": "m003",
+    "category": "multi_hop",
+    "question": "How do I issue a refund for a subscription invoice?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds", "https://docs.stripe.com/billing/invoices/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Refund the underlying charge (or PaymentIntent's charge) — the invoice tracks the resulting credit. Use POST /v1/refunds with the charge ID."
+  },
+  {
+    "id": "m004",
+    "category": "multi_hop",
+    "question": "If a webhook fails to deliver, can I still confirm a payment succeeded?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks", "https://docs.stripe.com/api/charges"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes. Webhooks are deliveries, not the source of truth — the Charge / PaymentIntent objects (retrievable via API) are. Stripe also retries failed deliveries."
+  },
+  {
+    "id": "m005",
+    "category": "multi_hop",
+    "question": "How would I implement 'save a card and charge later' using PaymentIntent and Customer?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents", "https://docs.stripe.com/api/customers"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Create the Customer, set up the PaymentIntent with setup_future_usage='off_session' or use SetupIntent, attach the resulting PaymentMethod to the Customer, then create off-session PaymentIntents later."
+  },
+  {
+    "id": "m006",
+    "category": "multi_hop",
+    "question": "What's the relationship between Customer, PaymentMethod, and PaymentIntent?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents", "https://docs.stripe.com/api/customers"],
+    "expected_abstain": false,
+    "gold_answer_summary": "A Customer can have many PaymentMethods attached. A PaymentIntent represents one payment attempt; it references a Customer and a PaymentMethod."
+  },
+  {
+    "id": "m007",
+    "category": "multi_hop",
+    "question": "When using Stripe Connect to charge customers, how do refunds work for connected accounts?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview", "https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Refunds for Connect charges debit either the platform or the connected account depending on the charge type (direct, destination, or separate charges and transfers)."
+  },
+  {
+    "id": "m008",
+    "category": "multi_hop",
+    "question": "What's the lifecycle from PaymentIntent to Charge to Dispute?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents", "https://docs.stripe.com/api/charges", "https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "PaymentIntent → succeeded produces a Charge. A cardholder can later dispute the Charge, creating a Dispute object with evidence-submission deadlines."
+  },
+  {
+    "id": "m009",
+    "category": "multi_hop",
+    "question": "What test card should I use to simulate a dispute?",
+    "expected_source_urls": ["https://docs.stripe.com/testing", "https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "4000 0000 0000 0259 (and variants) trigger a dispute simulation in test mode."
+  },
+  {
+    "id": "m010",
+    "category": "multi_hop",
+    "question": "When a subscription invoice fails to pay, which webhook events fire?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks", "https://docs.stripe.com/billing/invoices/overview", "https://docs.stripe.com/billing/subscriptions/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "invoice.payment_failed and (when the subscription transitions) customer.subscription.updated, possibly customer.subscription.deleted."
+  },
+  {
+    "id": "m011",
+    "category": "multi_hop",
+    "question": "How does Radar interact with a PaymentIntent that requires action?",
+    "expected_source_urls": ["https://docs.stripe.com/radar", "https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Radar can score the payment and inject a review or require 3D Secure step-up, surfacing as requires_action on the PaymentIntent."
+  },
+  {
+    "id": "m012",
+    "category": "multi_hop",
+    "question": "Can a refund cause a chargeback, or are they exclusive?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds", "https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "If a charge has been fully refunded, a dispute on it is unusual but possible (e.g. the cardholder disputes before the refund clears). They're separate flows."
+  },
+  {
+    "id": "m013",
+    "category": "multi_hop",
+    "question": "How do I onboard a Connect account and accept its first payment?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview", "https://docs.stripe.com/payments/accept-a-payment"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Create the connected account, complete onboarding (Express/Standard hosted), then create a PaymentIntent on behalf of that account using stripe_account header or on_behalf_of."
+  },
+  {
+    "id": "m014",
+    "category": "multi_hop",
+    "question": "How does Identity verification gate a Connect onboarding flow?",
+    "expected_source_urls": ["https://docs.stripe.com/identity", "https://docs.stripe.com/connect/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Connect onboarding can require Identity verification for the account holder; once the VerificationSession is verified the account can transact."
+  },
+  {
+    "id": "m015",
+    "category": "multi_hop",
+    "question": "For a marketplace using Connect, how do payouts to connected accounts work?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview", "https://docs.stripe.com/payouts"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Each connected account has its own payout schedule; the platform can configure schedules per account and trigger payouts manually via the API."
+  },
+
+  {
+    "id": "amb001",
+    "category": "ambiguous",
+    "question": "How do I fix a failed payment?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/payment-intents", "https://docs.stripe.com/testing"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Depends on failure reason: inspect last_payment_error on the PaymentIntent, surface a retry to the customer, or use test cards to reproduce the error code."
+  },
+  {
+    "id": "amb002",
+    "category": "ambiguous",
+    "question": "My customer says the charge didn't go through. What should I check?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges", "https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Check the PaymentIntent / Charge status, the last_payment_error.decline_code, and whether the charge succeeded but failed to be captured."
+  },
+  {
+    "id": "amb003",
+    "category": "ambiguous",
+    "question": "How do I make sure my integration is secure?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Verify webhook signatures, never log raw card data, use HTTPS, and rotate API keys regularly. The Webhooks doc covers signature verification in detail."
+  },
+  {
+    "id": "amb004",
+    "category": "ambiguous",
+    "question": "I want to charge my customers monthly. How do I set that up?",
+    "expected_source_urls": ["https://docs.stripe.com/billing/subscriptions/overview", "https://docs.stripe.com/billing/invoices/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Use Stripe Billing subscriptions with a monthly interval. Create a Product + Price, then a Subscription for the Customer."
+  },
+  {
+    "id": "amb005",
+    "category": "ambiguous",
+    "question": "What's the best way to handle disputes?",
+    "expected_source_urls": ["https://docs.stripe.com/disputes"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Respond before the deadline with strong evidence; use Radar rules to reduce dispute incidence; monitor your dispute rate in the Dashboard."
+  },
+  {
+    "id": "amb006",
+    "category": "ambiguous",
+    "question": "Can Stripe help with fraud?",
+    "expected_source_urls": ["https://docs.stripe.com/radar"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Yes — Stripe Radar provides built-in ML fraud detection plus configurable rules and review queues."
+  },
+  {
+    "id": "amb007",
+    "category": "ambiguous",
+    "question": "I need to refund a customer. How?",
+    "expected_source_urls": ["https://docs.stripe.com/refunds"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Via Dashboard (overflow menu → Refund payment) or API (POST /v1/refunds with the charge or payment_intent ID)."
+  },
+  {
+    "id": "amb008",
+    "category": "ambiguous",
+    "question": "How does Stripe handle international payments?",
+    "expected_source_urls": ["https://docs.stripe.com/payments"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Stripe supports many local payment methods (SEPA, iDEAL, Bancontact, etc.) and 135+ currencies. Available methods depend on the customer's country."
+  },
+  {
+    "id": "amb009",
+    "category": "ambiguous",
+    "question": "Why isn't my webhook firing?",
+    "expected_source_urls": ["https://docs.stripe.com/webhooks"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Common causes: endpoint URL wrong, signature verification rejecting, event type not subscribed, endpoint disabled, or endpoint returning non-2xx. Inspect Dashboard delivery attempts."
+  },
+  {
+    "id": "amb010",
+    "category": "ambiguous",
+    "question": "How do I onboard a new seller?",
+    "expected_source_urls": ["https://docs.stripe.com/connect/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Create a Connect connected account and run them through Stripe-hosted Express or Standard onboarding for identity, business info, and bank details."
+  },
+  {
+    "id": "amb011",
+    "category": "ambiguous",
+    "question": "Stripe is asking for identity verification. What should I do?",
+    "expected_source_urls": ["https://docs.stripe.com/identity", "https://docs.stripe.com/connect/overview"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Either a Stripe Identity VerificationSession or a Connect onboarding requirement; follow the hosted flow to upload an ID + selfie or required business info."
+  },
+  {
+    "id": "amb012",
+    "category": "ambiguous",
+    "question": "What's the simplest way to take a payment?",
+    "expected_source_urls": ["https://docs.stripe.com/payments/accept-a-payment"],
+    "expected_abstain": false,
+    "gold_answer_summary": "Use Stripe Checkout (hosted page) or the Payment Element with a PaymentIntent — both handle the heavy lifting."
+  },
+
+  {
+    "id": "adv001",
+    "category": "adversarial",
+    "question": "How do I use Stripe Atlas to incorporate my company?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Stripe Atlas is a separate product and is not covered by the ingested docs. Should abstain."
+  },
+  {
+    "id": "adv002",
+    "category": "adversarial",
+    "question": "How do I configure Stripe Tax for VAT in Germany?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Stripe Tax docs are not in the ingested corpus. Should abstain."
+  },
+  {
+    "id": "adv003",
+    "category": "adversarial",
+    "question": "How do I issue a refund using the Stripe iOS SDK?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "iOS SDK reference is not in the ingested corpus. Refund concept is, but mobile SDK is not. Should abstain on the iOS-specific aspect."
+  },
+  {
+    "id": "adv004",
+    "category": "adversarial",
+    "question": "What is Stripe Terminal and how do I use it for in-person payments?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Stripe Terminal is not in the ingested corpus. Should abstain."
+  },
+  {
+    "id": "adv005",
+    "category": "adversarial",
+    "question": "How do I issue virtual cards with Stripe Issuing?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Stripe Issuing is not in the ingested corpus. Should abstain."
+  },
+  {
+    "id": "adv006",
+    "category": "adversarial",
+    "question": "What's the difference between Stripe Capital and Stripe Treasury?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Neither product is in the ingested corpus. Should abstain."
+  },
+  {
+    "id": "adv007",
+    "category": "adversarial",
+    "question": "How do I integrate Stripe with Salesforce CRM?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Salesforce integration is not covered in the ingested docs. Should abstain."
+  },
+  {
+    "id": "adv008",
+    "category": "adversarial",
+    "question": "How does Stripe Climate offset my company's emissions?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Stripe Climate is not in the ingested corpus. Should abstain."
+  },
+  {
+    "id": "adv009",
+    "category": "adversarial",
+    "question": "What is Stripe Sigma and what kinds of queries does it support?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Stripe Sigma is not in the ingested corpus. Should abstain."
+  },
+  {
+    "id": "adv010",
+    "category": "adversarial",
+    "question": "How do I implement Apple Pay in a Stripe React Native app?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "React Native SDK specifics are not in the ingested corpus. Should abstain on the RN-specific implementation."
+  },
+  {
+    "id": "adv011",
+    "category": "adversarial",
+    "question": "How do I configure NET-30 B2B invoice payment terms?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "B2B invoicing with custom payment terms isn't covered by the ingested docs at this depth. Should abstain or escalate."
+  },
+  {
+    "id": "adv012",
+    "category": "adversarial",
+    "question": "What's the API endpoint for emailing receipts to customers?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Specific receipts-email API isn't covered in our slice. Should abstain rather than hallucinate the endpoint."
+  },
+
+  {
+    "id": "sc001",
+    "category": "stale_conflicting",
+    "question": "What is Stripe's current per-transaction fee for European cards?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Pricing isn't in the ingested technical docs and changes over time. Should abstain."
+  },
+  {
+    "id": "sc002",
+    "category": "stale_conflicting",
+    "question": "Is the Charges API deprecated in favor of PaymentIntents?",
+    "expected_source_urls": ["https://docs.stripe.com/api/charges", "https://docs.stripe.com/payments/payment-intents"],
+    "expected_abstain": false,
+    "gold_answer_summary": "PaymentIntents is the recommended modern API and the Charges API is considered legacy; both are documented and Charges still works for existing integrations."
+  },
+  {
+    "id": "sc003",
+    "category": "stale_conflicting",
+    "question": "What is Stripe's latency SLA?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Not in the ingested docs. Should abstain."
+  },
+  {
+    "id": "sc004",
+    "category": "stale_conflicting",
+    "question": "Does Stripe still support legacy Sources?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Sources detail is not in the ingested slice. Should abstain rather than guess."
+  },
+  {
+    "id": "sc005",
+    "category": "stale_conflicting",
+    "question": "Which Stripe API version should new integrations target?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "API versioning detail isn't in the ingested slice. Should abstain."
+  },
+
+  {
+    "id": "ood001",
+    "category": "out_of_domain",
+    "question": "Who is the current CEO of Stripe?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Out-of-scope corporate trivia. Should abstain."
+  },
+  {
+    "id": "ood002",
+    "category": "out_of_domain",
+    "question": "What was Stripe's revenue in 2018?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Financials are not in the technical docs. Should abstain."
+  },
+  {
+    "id": "ood003",
+    "category": "out_of_domain",
+    "question": "How do I integrate Stripe with my Shopify Plus checkout?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Shopify integration is not covered. Should abstain."
+  },
+  {
+    "id": "ood004",
+    "category": "out_of_domain",
+    "question": "How do I bake a chocolate sourdough?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood005",
+    "category": "out_of_domain",
+    "question": "What's the SQL schema of Stripe's internal data warehouse?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Not documented publicly. Should abstain."
+  },
+  {
+    "id": "ood006",
+    "category": "out_of_domain",
+    "question": "How do I install Python on Windows?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood007",
+    "category": "out_of_domain",
+    "question": "What's the weather in Dublin today?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood008",
+    "category": "out_of_domain",
+    "question": "How do I write a unit test in Jest?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood009",
+    "category": "out_of_domain",
+    "question": "What's the capital of France?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood010",
+    "category": "out_of_domain",
+    "question": "How do I use Linear for project management?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood011",
+    "category": "out_of_domain",
+    "question": "Explain quantum computing.",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood012",
+    "category": "out_of_domain",
+    "question": "What's the difference between TCP and UDP?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood013",
+    "category": "out_of_domain",
+    "question": "How do I deploy a Next.js app to Vercel?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood014",
+    "category": "out_of_domain",
+    "question": "What's the best way to learn machine learning?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood015",
+    "category": "out_of_domain",
+    "question": "How do I configure SSH keys for GitHub?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood016",
+    "category": "out_of_domain",
+    "question": "Tell me a joke.",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood017",
+    "category": "out_of_domain",
+    "question": "What's 2 + 2?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Off-topic. Should abstain."
+  },
+  {
+    "id": "ood018",
+    "category": "out_of_domain",
+    "question": "How does Stripe compare to PayPal financially?",
+    "expected_source_urls": [],
+    "expected_abstain": true,
+    "gold_answer_summary": "Comparative business analysis not in technical docs. Should abstain."
+  }
+]
