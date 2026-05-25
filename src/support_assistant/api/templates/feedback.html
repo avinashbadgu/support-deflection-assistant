@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Feedback · Support Assistant{% endblock %}
+{% block content %}
+<section class="page feedback-page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Feedback inbox</h1>
+      <p class="page-sub">User-flagged answers from the chat UI. Items tagged <strong>bad</strong> become regression cases the next time you run <code>support-assistant eval</code>.</p>
+    </div>
+    <div class="kpi-row">
+      <div class="kpi-mini"><div class="kpi-mini-label">Total</div><div class="kpi-mini-value" id="t-total">—</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">Bad</div><div class="kpi-mini-value" id="t-bad">—</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">Good</div><div class="kpi-mini-value" id="t-good">—</div></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="seg">
+      <button class="seg-btn active" data-filter="all">All</button>
+      <button class="seg-btn" data-filter="bad">Bad</button>
+      <button class="seg-btn" data-filter="good">Good</button>
+    </div>
+  </div>
+
+  <div id="fb-list" class="fb-list">
+    <div class="muted">Loading…</div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let all = [];
+function esc(s) { return (s || "").replace(/[<>"&]/g, c => ({"<":"&lt;",">":"&gt;","\"":"&quot;","&":"&amp;"}[c])); }
+function fmtTs(ts) { if (!ts) return ""; return new Date(ts * 1000).toLocaleString(); }
+
+function render(filter) {
+  const list = filter === "all" ? all : all.filter(f => f.rating === filter);
+  const root = document.getElementById("fb-list");
+  if (list.length === 0) {
+    root.innerHTML = `<div class="empty-state"><div class="empty-title">No feedback yet</div><div class="empty-sub">Use 👍/👎 in chat to log entries here.</div></div>`;
+    return;
+  }
+  root.innerHTML = list.map(f => `
+    <article class="fb-card">
+      <header class="fb-head">
+        <span class="pill ${f.rating === "bad" ? "pill-bad" : "pill-ok"}">${f.rating}</span>
+        <span class="muted mono">${esc(f.event_id)}</span>
+        <span class="muted">${fmtTs(f.ts)}</span>
+      </header>
+      <div class="fb-q"><strong>Q:</strong> ${esc(f.question)}</div>
+      <div class="fb-a"><strong>A:</strong> <span>${esc(f.answer)}</span></div>
+      ${f.note ? `<div class="fb-note">📝 ${esc(f.note)}</div>` : ""}
+      ${(f.citations || []).length ? `<div class="fb-cites">
+        ${f.citations.map(c => `<a class="pill pill-cite" href="${c.url}" target="_blank" rel="noopener">${esc(c.title || c.url)}</a>`).join("")}
+      </div>` : ""}
+    </article>`).join("");
+}
+
+async function load() {
+  const r = await fetch("/api/feedback");
+  const d = await r.json();
+  all = d.feedback || [];
+  document.getElementById("t-total").textContent = all.length;
+  document.getElementById("t-bad").textContent  = all.filter(f => f.rating === "bad").length;
+  document.getElementById("t-good").textContent = all.filter(f => f.rating === "good").length;
+  render("all");
+}
+
+document.querySelectorAll(".seg-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    render(btn.dataset.filter);
+  });
+});
+
+load();
+</script>
+{% endblock %}
