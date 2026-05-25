@@ -1,0 +1,254 @@
+{% extends "base.html" %}
+{% block title %}Chat · Support Assistant{% endblock %}
+{% block content %}
+<section class="page chat-page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Ask Stripe Docs</h1>
+      <p class="page-sub">Grounded answers from public Stripe documentation. The assistant refuses to guess when the answer isn't in the corpus.</p>
+    </div>
+  </header>
+
+  <div class="composer">
+    <form id="ask-form" class="composer-form">
+      <div class="composer-field">
+        <textarea id="question" rows="2" placeholder="e.g. How do I issue a partial refund?" autocomplete="off" spellcheck="true"></textarea>
+        <div class="composer-actions">
+          <span class="composer-hint"><kbd>⌘</kbd>/<kbd>Ctrl</kbd> + <kbd>↵</kbd></span>
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-label">Ask</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div class="examples" id="examples">
+      <span class="examples-label">Try:</span>
+      <button class="chip" data-q="How do I issue a partial refund?">partial refunds</button>
+      <button class="chip" data-q="How does Stripe verify webhook signatures?">webhook signatures</button>
+      <button class="chip" data-q="What test card simulates a successful payment?">test cards</button>
+      <button class="chip" data-q="What is Stripe Connect for?">Stripe Connect</button>
+      <button class="chip chip-warn" data-q="How do I integrate Stripe with Shopify?">out-of-scope (should abstain)</button>
+    </div>
+  </div>
+
+  <div id="answer-area" class="answer-stream">
+    <div class="empty-state" id="empty-state">
+      <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <div class="empty-title">No questions yet</div>
+      <div class="empty-sub">Ask one above or pick an example.</div>
+    </div>
+  </div>
+</section>
+
+<template id="skeleton-template">
+  <article class="answer skeleton">
+    <div class="answer-head">
+      <span class="skel skel-pill"></span>
+      <span class="skel skel-pill"></span>
+      <span class="skel skel-pill"></span>
+    </div>
+    <div class="skel skel-line w-90"></div>
+    <div class="skel skel-line w-100"></div>
+    <div class="skel skel-line w-70"></div>
+  </article>
+</template>
+
+<template id="answer-template">
+  <article class="answer">
+    <header class="answer-head">
+      <span class="pill pill-status" data-role="abstain"></span>
+      <span class="pill" data-role="cache"></span>
+      <span class="pill" data-role="latency"></span>
+      <span class="pill pill-mono" data-role="cost"></span>
+      <div class="answer-tools">
+        <button class="icon-btn small" data-role="copy" title="copy answer">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </header>
+    <div class="answer-q" data-role="question"></div>
+    <div class="answer-text markdown" data-role="text"></div>
+    <details class="sources">
+      <summary>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span data-role="sources-count">Sources</span>
+      </summary>
+      <ol class="sources-list" data-role="sources"></ol>
+    </details>
+    <footer class="feedback">
+      <span class="feedback-label">Was this helpful?</span>
+      <button class="icon-btn" data-rating="good" aria-label="helpful">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v12M15 5.88 14 10h5.83a2 2 0 0 1 2 2.34l-1.55 9A2 2 0 0 1 18.31 23H7"/></svg>
+      </button>
+      <button class="icon-btn" data-rating="bad" aria-label="not helpful">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V2M9 18.12 10 14H4.17a2 2 0 0 1-2-2.34l1.55-9A2 2 0 0 1 5.69 1H17"/></svg>
+      </button>
+      <input type="text" class="note-input" data-role="note" placeholder="(optional note for the eval set)">
+    </footer>
+  </article>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script>
+const form = document.getElementById("ask-form");
+const ta = document.getElementById("question");
+const area = document.getElementById("answer-area");
+const emptyState = document.getElementById("empty-state");
+const tpl = document.getElementById("answer-template");
+const skelTpl = document.getElementById("skeleton-template");
+
+// Pre-fill from query param if present.
+const qp = new URL(location.href).searchParams.get("q");
+if (qp) { ta.value = qp; ta.dispatchEvent(new Event("input")); }
+
+// Autosize textarea.
+ta.addEventListener("input", () => {
+  ta.style.height = "auto";
+  ta.style.height = Math.min(ta.scrollHeight, 240) + "px";
+});
+
+// Cmd/Ctrl+Enter to submit.
+ta.addEventListener("keydown", (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+    e.preventDefault();
+    form.requestSubmit();
+  }
+});
+
+// Example chips.
+document.querySelectorAll("#examples .chip").forEach(btn => {
+  btn.addEventListener("click", () => {
+    ta.value = btn.dataset.q;
+    ta.dispatchEvent(new Event("input"));
+    ta.focus();
+  });
+});
+
+ta.focus();
+
+// Configure marked for safer rendering.
+if (window.marked) marked.setOptions({breaks: true, gfm: true, mangle: false, headerIds: false});
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const q = ta.value.trim();
+  if (!q) return;
+
+  if (emptyState) emptyState.remove();
+
+  const skel = skelTpl.content.cloneNode(true);
+  const skelNode = skel.querySelector(".answer");
+  area.prepend(skel);
+
+  const t0 = performance.now();
+  let data;
+  try {
+    const r = await fetch("/api/ask", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({question: q})
+    });
+    if (!r.ok) {
+      let detail = "";
+      try { detail = (await r.json()).detail || ""; } catch (_) {}
+      throw new Error(`HTTP ${r.status}${detail ? " — " + detail : ""}`);
+    }
+    data = await r.json();
+  } catch (err) {
+    skelNode.remove();
+    toast("Request failed: " + err.message, "bad");
+    return;
+  }
+  const wallMs = Math.round(performance.now() - t0);
+
+  const node = tpl.content.cloneNode(true);
+  const art = node.querySelector(".answer");
+  art.dataset.eventId = data.event_id;
+  art.dataset.question = q;
+  art.dataset.answer = data.answer;
+  art.dataset.citations = JSON.stringify(data.citations || []);
+
+  const statusPill = node.querySelector('[data-role="abstain"]');
+  statusPill.textContent = data.abstained ? "Abstained" : "Answered";
+  statusPill.classList.add(data.abstained ? "pill-warn" : "pill-ok");
+
+  const cachePill = node.querySelector('[data-role="cache"]');
+  cachePill.textContent = data.cache_hit ? "cache hit" : "cache miss";
+  if (data.cache_hit) cachePill.classList.add("pill-cache");
+
+  node.querySelector('[data-role="latency"]').textContent = `${wallMs} ms`;
+  node.querySelector('[data-role="cost"]').textContent = `$${(data.cost_usd || 0).toFixed(5)}`;
+  node.querySelector('[data-role="question"]').textContent = q;
+
+  const textEl = node.querySelector('[data-role="text"]');
+  textEl.innerHTML = window.marked ? marked.parse(data.answer || "") : (data.answer || "");
+
+  const ol = node.querySelector('[data-role="sources"]');
+  const cites = data.citations || [];
+  node.querySelector('[data-role="sources-count"]').textContent = `${cites.length} source${cites.length === 1 ? "" : "s"}`;
+  cites.forEach(c => {
+    const li = document.createElement("li");
+    li.className = "source";
+    const scorePct = Math.max(0, Math.min(1, c.score || 0)) * 100;
+    li.innerHTML = `
+      <div class="source-head">
+        <a class="source-title" href="${c.url}" target="_blank" rel="noopener">${c.title || c.url}</a>
+        <span class="source-score">${(c.score || 0).toFixed(3)}</span>
+      </div>
+      <div class="score-bar"><div class="score-bar-fill" style="width:${scorePct}%"></div></div>
+    `;
+    ol.appendChild(li);
+  });
+
+  // Copy button.
+  node.querySelector('[data-role="copy"]').addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(data.answer || "");
+      toast("Copied");
+    } catch (e) {
+      toast("Copy failed", "bad");
+    }
+  });
+
+  art.querySelectorAll(".feedback .icon-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (btn.classList.contains("active")) return;
+      const note = art.querySelector('[data-role="note"]').value;
+      btn.classList.add("active");
+      const sibling = btn.parentElement.querySelector(`.icon-btn:not([data-rating="${btn.dataset.rating}"])`);
+      if (sibling) sibling.disabled = true;
+      try {
+        const res = await fetch("/api/feedback", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            event_id: art.dataset.eventId,
+            rating: btn.dataset.rating,
+            note,
+            question: art.dataset.question,
+            answer: art.dataset.answer,
+            citations: JSON.parse(art.dataset.citations || "[]"),
+          })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        toast(btn.dataset.rating === "good" ? "Thanks for the feedback" : "Logged — will become a regression case", btn.dataset.rating === "good" ? "ok" : "bad");
+      } catch (err) {
+        toast("Feedback failed: " + err.message, "bad");
+        btn.classList.remove("active");
+        if (sibling) sibling.disabled = false;
+      }
+    });
+  });
+
+  skelNode.replaceWith(node);
+  window.pushRecent?.(q);
+  ta.value = "";
+  ta.style.height = "auto";
+  ta.focus();
+});
+</script>
+{% endblock %}
