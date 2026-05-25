@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Settings · Support Assistant{% endblock %}
+{% block content %}
+<section class="page settings-page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Runtime settings</h1>
+      <p class="page-sub">Tune retrieval, abstention, and caching live without restarting the server. <strong>These changes are in-process only</strong> — they don't persist across restarts. Edit <code>.env</code> for permanent changes.</p>
+    </div>
+  </header>
+
+  <form id="settings-form" class="settings-grid">
+    <div class="settings-section">
+      <h2>Retrieval</h2>
+      <label>
+        <span class="lbl">top_k <span class="hint">candidates fetched before rerank</span></span>
+        <input type="number" min="1" max="50" name="top_k">
+      </label>
+      <label>
+        <span class="lbl">rerank_top_n <span class="hint">kept after rerank, fed to the generator</span></span>
+        <input type="number" min="1" max="20" name="rerank_top_n">
+      </label>
+      <label class="toggle">
+        <input type="checkbox" name="use_reranker">
+        <span>Use LLM reranker</span>
+      </label>
+    </div>
+
+    <div class="settings-section">
+      <h2>Abstention</h2>
+      <label>
+        <span class="lbl">abstain_min_score <span class="hint">top-1 cosine floor (0.0–1.0)</span></span>
+        <div class="slider-row">
+          <input type="range" name="abstain_min_score" min="0" max="0.9" step="0.01">
+          <span class="slider-val mono" id="v-min-score">—</span>
+        </div>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" name="abstain_use_judge">
+        <span>Run LLM judge as a second gate</span>
+      </label>
+    </div>
+
+    <div class="settings-section">
+      <h2>Semantic cache</h2>
+      <label class="toggle">
+        <input type="checkbox" name="use_cache">
+        <span>Enable cache</span>
+      </label>
+      <label>
+        <span class="lbl">cache_similarity <span class="hint">cosine threshold for a cache hit</span></span>
+        <div class="slider-row">
+          <input type="range" name="cache_similarity" min="0.8" max="0.999" step="0.001">
+          <span class="slider-val mono" id="v-cache-sim">—</span>
+        </div>
+      </label>
+      <label>
+        <span class="lbl">cache_ttl_seconds <span class="hint">how long a cached answer stays valid</span></span>
+        <input type="number" min="0" max="86400" name="cache_ttl_seconds">
+      </label>
+    </div>
+
+    <div class="settings-section settings-actions">
+      <button type="submit" class="btn btn-primary">Apply</button>
+      <button type="button" class="btn btn-ghost" id="reload">Reload from server</button>
+    </div>
+  </form>
+
+  <div class="panel" style="margin-top:24px">
+    <div class="panel-head"><h2>Locked (require re-index)</h2><span class="panel-sub">change in <code>.env</code> then re-run <code>support-assistant ingest --full</code></span></div>
+    <table class="data-table" id="locked-table">
+      <thead><tr><th>Key</th><th>Current</th><th>Why locked</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const form = document.getElementById("settings-form");
+const vMin = document.getElementById("v-min-score");
+const vCache = document.getElementById("v-cache-sim");
+
+function setForm(s) {
+  for (const [k, v] of Object.entries(s)) {
+    const el = form.elements.namedItem(k);
+    if (!el) continue;
+    if (el.type === "checkbox") el.checked = !!v;
+    else el.value = v;
+  }
+  vMin.textContent  = Number(s.abstain_min_score).toFixed(2);
+  vCache.textContent = Number(s.cache_similarity).toFixed(3);
+}
+
+function setLocked(current, reasons) {
+  const tbody = document.querySelector("#locked-table tbody");
+  tbody.innerHTML = Object.entries(reasons).map(([k, r]) => {
+    return `<tr><td class="mono">${k}</td><td class="mono">${current[k]}</td><td class="muted">${r}</td></tr>`;
+  }).join("");
+}
+
+async function load() {
+  const r = await fetch("/api/settings");
+  const d = await r.json();
+  setForm(d.settings || {});
+  setLocked(d.settings || {}, d.locked_reason || {});
+}
+
+form.elements.abstain_min_score.addEventListener("input", e => vMin.textContent = Number(e.target.value).toFixed(2));
+form.elements.cache_similarity.addEventListener("input", e => vCache.textContent = Number(e.target.value).toFixed(3));
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = new FormData(form);
+  const body = {};
+  for (const el of form.elements) {
+    if (!el.name) continue;
+    if (el.type === "checkbox") body[el.name] = el.checked;
+    else if (el.type === "number") body[el.name] = Number(el.value);
+    else if (el.type === "range") body[el.name] = Number(el.value);
+  }
+  const r = await fetch("/api/settings", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) { toast("Apply failed", "bad"); return; }
+  const d = await r.json();
+  setForm(d.settings || {});
+  toast(`Applied: ${Object.keys(d.applied || {}).join(", ") || "(no changes)"}`);
+});
+
+document.getElementById("reload").addEventListener("click", load);
+load();
+</script>
+{% endblock %}
