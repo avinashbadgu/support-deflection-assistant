@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Support Assistant{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236366f1'/%3E%3Cpath d='M10 12h12M10 16h12M10 20h7' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+  <script>
+    // Apply saved theme before paint to avoid flash.
+    (function () {
+      try {
+        const t = localStorage.getItem("sa-theme");
+        if (t) document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#818cf8"/>
+              <stop offset="1" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+          <rect width="32" height="32" rx="8" fill="url(#g)"/>
+          <path d="M10 12h12M10 16h12M10 20h7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div class="brand-text">
+          <div class="brand-name">Support Assistant</div>
+          <div class="brand-sub">grounded · with abstention</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a href="/" class="nav-item" data-nav="chat">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Chat</span>
+        </a>
+        <a href="/dashboard" class="nav-item" data-nav="dashboard">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="/sources" class="nav-item" data-nav="sources">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          <span>Sources</span>
+        </a>
+        <a href="/eval" class="nav-item" data-nav="eval">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span>Eval</span>
+        </a>
+        <a href="/feedback" class="nav-item" data-nav="feedback">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+          <span>Feedback</span>
+          <span class="nav-badge" id="nav-fb-count" hidden></span>
+        </a>
+        <a href="/settings" class="nav-item" data-nav="settings">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9 1.65 1.65 0 0 0 4.27 7.18l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="recent" id="recent-panel" hidden>
+        <div class="recent-label">Recent</div>
+        <div class="recent-list" id="recent-list"></div>
+      </div>
+
+      <div class="sidebar-foot">
+        <button class="ghost-btn" id="theme-toggle" aria-label="toggle theme">
+          <svg class="icon-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <svg class="icon-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <button class="ghost-btn" id="kbd-toggle" aria-label="keyboard shortcuts" title="Keyboard shortcuts (?)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M10 14h.01M14 14h.01M18 14h.01"/></svg>
+        </button>
+        <div class="status-row">
+          <div class="status-dot"></div>
+          <span>Stripe docs</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Keyboard shortcuts modal -->
+  <div class="modal" id="kbd-modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Keyboard shortcuts</h3>
+        <button class="ghost-btn" data-close aria-label="close">✕</button>
+      </div>
+      <table class="kbd-table">
+        <tr><td><kbd>?</kbd></td><td>Open this dialog</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Close dialogs</td></tr>
+        <tr><td><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>Enter</kbd></td><td>Send question (chat page)</td></tr>
+        <tr><td><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>K</kbd></td><td>Focus question input</td></tr>
+        <tr><td><kbd>g</kbd> then <kbd>c</kbd></td><td>Go to Chat</td></tr>
+        <tr><td><kbd>g</kbd> then <kbd>d</kbd></td><td>Go to Dashboard</td></tr>
+        <tr><td><kbd>g</kbd> then <kbd>s</kbd></td><td>Go to Sources</td></tr>
+        <tr><td><kbd>g</kbd> then <kbd>e</kbd></td><td>Go to Eval</td></tr>
+        <tr><td><kbd>g</kbd> then <kbd>f</kbd></td><td>Go to Feedback</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+  {% block scripts %}{% endblock %}
+  <script>
+    // Mark current nav item.
+    document.querySelectorAll(".nav-item").forEach(el => {
+      const path = location.pathname;
+      const k = el.dataset.nav;
+      if ((path === "/" && k === "chat")
+        || (path.startsWith("/dashboard") && k === "dashboard")
+        || (path.startsWith("/sources") && k === "sources")
+        || (path.startsWith("/eval") && k === "eval")
+        || (path.startsWith("/feedback") && k === "feedback")
+        || (path.startsWith("/settings") && k === "settings")) {
+        el.classList.add("active");
+      }
+    });
+
+    // Toast helper.
+    window.toast = (msg, kind = "ok") => {
+      const stack = document.getElementById("toast-stack");
+      const el = document.createElement("div");
+      el.className = `toast toast-${kind}`;
+      el.textContent = msg;
+      stack.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("toast-show"));
+      setTimeout(() => { el.classList.remove("toast-show"); setTimeout(() => el.remove(), 300); }, 2600);
+    };
+
+    // Theme toggle.
+    const themeBtn = document.getElementById("theme-toggle");
+    themeBtn?.addEventListener("click", () => {
+      const cur = document.documentElement.dataset.theme || "dark";
+      const next = cur === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      try { localStorage.setItem("sa-theme", next); } catch (e) {}
+    });
+
+    // Recent queries from localStorage.
+    function loadRecent() {
+      try {
+        const items = JSON.parse(localStorage.getItem("sa-recent") || "[]");
+        const panel = document.getElementById("recent-panel");
+        const list = document.getElementById("recent-list");
+        if (!panel || !list) return;
+        if (items.length === 0) { panel.hidden = true; return; }
+        panel.hidden = false;
+        list.innerHTML = items.slice(0, 5).map(q => {
+          const safe = q.replace(/[<>"&]/g, c => ({"<":"&lt;",">":"&gt;","\"":"&quot;","&":"&amp;"}[c]));
+          return `<a class="recent-item" href="/?q=${encodeURIComponent(q)}" title="${safe}">${safe}</a>`;
+        }).join("");
+      } catch (e) {}
+    }
+    window.pushRecent = (q) => {
+      try {
+        const items = JSON.parse(localStorage.getItem("sa-recent") || "[]").filter(x => x !== q);
+        items.unshift(q);
+        localStorage.setItem("sa-recent", JSON.stringify(items.slice(0, 12)));
+        loadRecent();
+      } catch (e) {}
+    };
+    loadRecent();
+
+    // Feedback count badge.
+    fetch("/api/feedback").then(r => r.json()).then(d => {
+      const el = document.getElementById("nav-fb-count");
+      if (!el) return;
+      if (d.count > 0) { el.textContent = d.count; el.hidden = false; }
+    }).catch(() => {});
+
+    // Keyboard shortcuts.
+    const kbdModal = document.getElementById("kbd-modal");
+    function showKbd(show) {
+      // Belt-and-braces: set BOTH the hidden attribute and the inline display
+      // style. Inline style beats any cached/stale CSS rule.
+      kbdModal.hidden = !show;
+      kbdModal.style.display = show ? "flex" : "none";
+    }
+    // Ensure initial state is hidden regardless of CSS.
+    kbdModal.style.display = "none";
+    document.getElementById("kbd-toggle")?.addEventListener("click", () => showKbd(true));
+    kbdModal.querySelectorAll("[data-close]").forEach(el =>
+      el.addEventListener("click", (e) => { e.stopPropagation(); showKbd(false); })
+    );
+    // Also: any click outside .modal-card should close (covers backdrop reliably).
+    kbdModal.addEventListener("click", (e) => {
+      if (!e.target.closest(".modal-card")) showKbd(false);
+    });
+
+    let gPressed = false, gTimer = null;
+    document.addEventListener("keydown", (e) => {
+      const tag = (e.target.tagName || "").toLowerCase();
+      const inField = tag === "input" || tag === "textarea" || e.target.isContentEditable;
+      if (e.key === "Escape") { showKbd(false); return; }
+      if (inField) return;
+      if (e.key === "?" || (e.shiftKey && e.key === "/")) { e.preventDefault(); showKbd(true); return; }
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        const ta = document.getElementById("question");
+        if (ta) { e.preventDefault(); ta.focus(); }
+        return;
+      }
+      if (e.key.toLowerCase() === "g") {
+        gPressed = true;
+        clearTimeout(gTimer);
+        gTimer = setTimeout(() => { gPressed = false; }, 800);
+        return;
+      }
+      if (gPressed) {
+        const map = {c: "/", d: "/dashboard", s: "/sources", e: "/eval", f: "/feedback"};
+        const dest = map[e.key.toLowerCase()];
+        if (dest) { e.preventDefault(); gPressed = false; location.href = dest; }
+      }
+    });
+  </script>
+</body>
+</html>
