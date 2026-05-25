@@ -1,0 +1,154 @@
+{
+  "config_tag": "compare-hybrid",
+  "n_cases": 5,
+  "recall_at_k_mean": 1.0,
+  "abstention": {
+    "accuracy": 1.0,
+    "precision_abstain": 0.0,
+    "recall_abstain": 0.0,
+    "tp": 0,
+    "tn": 5,
+    "fp": 0,
+    "fn": 0
+  },
+  "faithfulness_mean": null,
+  "hallucination_rate": null,
+  "latency_p50_ms": 7484.147799994389,
+  "latency_p95_ms": 8117.27054000221,
+  "cost_total_usd": 0.00428059,
+  "cost_mean_usd": 0.000856118,
+  "settings_snapshot": {
+    "embed_model": "text-embedding-3-small",
+    "gen_model": "gpt-4o-mini",
+    "judge_model": "gpt-4o-mini",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 8,
+    "rerank_top_n": 5,
+    "use_reranker": false,
+    "reranker_kind": "none",
+    "use_cache": true,
+    "use_hybrid": true,
+    "bm25_top_k": 20,
+    "rrf_k": 60,
+    "abstain_min_score": 0.35,
+    "abstain_use_judge": true
+  },
+  "by_category": [
+    {
+      "category": "direct_retrieval",
+      "n": 5,
+      "recall_at_k_mean": 1.0,
+      "abstention_accuracy": 1.0,
+      "faithfulness_mean": null,
+      "latency_p95_ms": 8117.27054000221
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "d001",
+      "category": "direct_retrieval",
+      "question": "How do I issue a partial refund for a charge?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide clear instructions on how to issue a partial refund using the Dashboard, including steps to enter a different refund amount.",
+      "answer": "To issue a partial refund for a charge using the Stripe Dashboard, follow these steps:\n\n1. Find the payment you want to refund on the Payments page.\n2. Click the overflow menu next to the payment and select \"Refund payment.\"\n3. By default, a full refund is issued, so enter a different refund amount for a partial refund.\n4. Select a reason for the refund and click \"Refund.\"\n\nYou can issue multiple refunds against a charge, but the total refunded amount cannot exceed the original charge amount [1].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 7544.215900001291,
+      "cost_usd": 0.00081009
+    },
+    {
+      "case_id": "d002",
+      "category": "direct_retrieval",
+      "question": "What does a PaymentIntent represent and what are its main statuses?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide sufficient information about the PaymentIntent and its statuses, including how it relates to payment outcomes and subscription statuses.",
+      "answer": "A PaymentIntent represents the lifecycle of a payment in Stripe, tracking details such as the amount, currency, and payment methods. It is generated whenever a payment is due for a subscription and is linked to an invoice [2][3].\n\nThe main statuses of a PaymentIntent are:\n1. **succeeded** - Payment was successful.\n2. **requires_payment_method** - Payment failed due to a card error.\n3. **requires_action** - Payment failed due to authentication issues.\n4. **processing** - Payment is being processed for methods with longer processing times [1][4].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/payments/payment-intents"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 6453.062900000077,
+      "cost_usd": 0.00086688
+    },
+    {
+      "case_id": "d003",
+      "category": "direct_retrieval",
+      "question": "How does Stripe verify the signature of an incoming webhook?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide detailed information on how to verify the signature of an incoming webhook from Stripe, including the use of the Stripe-Signature header, the endpoint's secret, and the process of verification.",
+      "answer": "Stripe verifies the signature of an incoming webhook by including a signature in the `Stripe-Signature` header. To confirm that the event wasn't sent or modified by a third party, you need to retrieve your endpoint's secret and use it to verify the signature. This can be done using Stripe's official libraries or manually. The verification process requires the raw body of the request, the `Stripe-Signature` header, and the endpoint's secret. If the verification fails, an error will be generated [1][2][3][4].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 8260.53420000244,
+      "cost_usd": 0.0008935799999999999
+    },
+    {
+      "case_id": "d004",
+      "category": "direct_retrieval",
+      "question": "What is Stripe Radar and what does it do?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide a clear overview of Stripe Radar, including its purpose of protecting businesses against fraud, how it evaluates transactions in real time using AI algorithms, and its various features such as risk settings and fraud analytics.",
+      "answer": "Stripe Radar is a fraud prevention tool that helps businesses protect against fraudulent transactions. It evaluates transactions in real time using AI algorithms to assess the risk of fraud. Radar can block payments with high risk levels, automate responses to fraud warnings, and allow for customization of fraud interventions through settings and rules. Additionally, it provides analytics to understand fraud patterns and their impact on the business [1], [2], [4].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/radar",
+        "https://docs.stripe.com/radar",
+        "https://docs.stripe.com/radar",
+        "https://docs.stripe.com/testing",
+        "https://docs.stripe.com/testing"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 5500.930599999265,
+      "cost_usd": 0.0008827199999999999
+    },
+    {
+      "case_id": "d005",
+      "category": "direct_retrieval",
+      "question": "How do disputes work on Stripe and what should I do when I receive one?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide detailed information on how disputes work on Stripe, including the process of responding to disputes and the resources available for assistance.",
+      "answer": "Disputes on Stripe occur when a cardholder questions a payment with their card issuer, leading to a chargeback that reverses the payment and debits your balance for the payment amount and any associated fees [1]. \n\nWhen you receive a dispute, you can respond through the Stripe Dashboard, where you can provide text and images to support your case [2]. If you need assistance, you can contact Stripe support [2]. Additionally, you can use Smart Disputes to automate evidence collection for eligible disputes [4].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/refunds"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 7484.147799994389,
+      "cost_usd": 0.00082732
+    }
+  ]
+}
