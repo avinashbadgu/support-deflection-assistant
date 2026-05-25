@@ -1,0 +1,112 @@
+{
+  "config_tag": "compare-hybrid",
+  "n_cases": 3,
+  "recall_at_k_mean": 1.0,
+  "abstention": {
+    "accuracy": 0.0,
+    "precision_abstain": 0.0,
+    "recall_abstain": 0.0,
+    "tp": 0,
+    "tn": 0,
+    "fp": 3,
+    "fn": 0
+  },
+  "faithfulness_mean": null,
+  "hallucination_rate": null,
+  "latency_p50_ms": 839.0240999942762,
+  "latency_p95_ms": 1011.8230200016114,
+  "cost_total_usd": 0.00201521,
+  "cost_mean_usd": 0.0006717366666666667,
+  "settings_snapshot": {
+    "embed_model": "text-embedding-3-small",
+    "gen_model": "gpt-4o-mini",
+    "judge_model": "gpt-4o-mini",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 8,
+    "rerank_top_n": 5,
+    "use_reranker": false,
+    "reranker_kind": "none",
+    "use_cache": true,
+    "use_hybrid": true,
+    "bm25_top_k": 20,
+    "rrf_k": 60,
+    "abstain_min_score": 0.35,
+    "abstain_use_judge": true
+  },
+  "by_category": [
+    {
+      "category": "direct_retrieval",
+      "n": 3,
+      "recall_at_k_mean": 1.0,
+      "abstention_accuracy": 0.0,
+      "faithfulness_mean": null,
+      "latency_p95_ms": 1011.8230200016114
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "d001",
+      "category": "direct_retrieval",
+      "question": "How do I issue a partial refund for a charge?",
+      "expected_abstain": false,
+      "did_abstain": true,
+      "abstain_reason": "top_score_below_floor:0.033<0.35",
+      "answer": "I don't have a confident answer to that from the available documentation. I've flagged this for a human support agent who will follow up.",
+      "retrieved_urls": [
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 1031.0229000024265,
+      "cost_usd": 0.00087734
+    },
+    {
+      "case_id": "d002",
+      "category": "direct_retrieval",
+      "question": "What does a PaymentIntent represent and what are its main statuses?",
+      "expected_abstain": false,
+      "did_abstain": true,
+      "abstain_reason": "top_score_below_floor:0.032<0.35",
+      "answer": "I don't have a confident answer to that from the available documentation. I've flagged this for a human support agent who will follow up.",
+      "retrieved_urls": [
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/payments/payment-intents"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 839.0240999942762,
+      "cost_usd": 0.0006988
+    },
+    {
+      "case_id": "d003",
+      "category": "direct_retrieval",
+      "question": "How does Stripe verify the signature of an incoming webhook?",
+      "expected_abstain": false,
+      "did_abstain": true,
+      "abstain_reason": "top_score_below_floor:0.033<0.35",
+      "answer": "I don't have a confident answer to that from the available documentation. I've flagged this for a human support agent who will follow up.",
+      "retrieved_urls": [
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 798.75589999574,
+      "cost_usd": 0.00043906999999999996
+    }
+  ]
+}
