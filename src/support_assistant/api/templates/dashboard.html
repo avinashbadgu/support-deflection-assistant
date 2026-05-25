@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Support Assistant{% endblock %}
+{% block content %}
+<section class="page dashboard-page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Live operational signal from <code>data/events.jsonl</code>.</p>
+    </div>
+    <button class="btn btn-ghost" id="refresh">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>
+      <span>Refresh</span>
+    </button>
+  </header>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Queries</div>
+      <div class="kpi-value" id="m-n">—</div>
+      <div class="kpi-foot">total in last 1000 events</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Abstention rate</div>
+      <div class="kpi-value" id="m-abst">—</div>
+      <div class="kpi-foot">refused to guess</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Cache hit rate</div>
+      <div class="kpi-value" id="m-cache">—</div>
+      <div class="kpi-foot">semantic cache</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">p50 latency</div>
+      <div class="kpi-value" id="m-p50">—</div>
+      <div class="kpi-foot">end-to-end</div>
+    </div>
+    <div class="kpi kpi-accent">
+      <div class="kpi-label">p95 latency</div>
+      <div class="kpi-value" id="m-p95">—</div>
+      <div class="kpi-foot">tail — the one that matters</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Cost (total)</div>
+      <div class="kpi-value" id="m-cost">—</div>
+      <div class="kpi-foot"><span id="m-cost-mean">—</span> per query</div>
+    </div>
+  </div>
+
+  <div class="panel-grid">
+    <div class="panel panel-wide">
+      <div class="panel-head">
+        <h2>Latency over time</h2>
+        <span class="panel-sub">end-to-end, ms</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-latency"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Stage breakdown</h2>
+        <span class="panel-sub">p95 per stage, ms</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-stages"></canvas></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Cost per query</h2>
+        <span class="panel-sub">USD</span>
+      </div>
+      <div class="chart-wrap"><canvas id="chart-cost"></canvas></div>
+    </div>
+    <div class="panel panel-wide">
+      <div class="panel-head">
+        <h2>Recent queries</h2>
+        <span class="panel-sub">last 12</span>
+      </div>
+      <table class="events-table">
+        <thead><tr><th>When</th><th>Status</th><th>Latency</th><th>Cost</th></tr></thead>
+        <tbody id="events-tbody"><tr><td colspan="4" class="muted">No events yet — ask a few questions.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const css = getComputedStyle(document.documentElement);
+const COL_INDIGO = css.getPropertyValue("--accent").trim() || "#818cf8";
+const COL_TEAL   = css.getPropertyValue("--ok").trim() || "#34d399";
+const COL_AMBER  = css.getPropertyValue("--warn").trim() || "#fbbf24";
+const COL_GRID   = "rgba(255,255,255,0.06)";
+const COL_TEXT   = "rgba(231,235,243,0.62)";
+
+Chart.defaults.font.family = "Inter, system-ui, sans-serif";
+Chart.defaults.color = COL_TEXT;
+Chart.defaults.borderColor = COL_GRID;
+
+let latencyChart, costChart, stagesChart;
+
+function gradient(ctx, color) {
+  const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
+  g.addColorStop(0, color + "55");
+  g.addColorStop(1, color + "00");
+  return g;
+}
+
+const baseLineOpts = {
+  responsive: true,
+  maintainAspectRatio: false,
+  interaction: { intersect: false, mode: "index" },
+  plugins: { legend: { display: false }, tooltip: { backgroundColor: "#0f172a", borderColor: COL_GRID, borderWidth: 1 } },
+  scales: {
+    x: { grid: { color: COL_GRID }, ticks: { color: COL_TEXT } },
+    y: { beginAtZero: true, grid: { color: COL_GRID }, ticks: { color: COL_TEXT } },
+  },
+  elements: { point: { radius: 0, hoverRadius: 4 }, line: { tension: 0.35, borderWidth: 2 } },
+};
+
+function fmtTs(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts * 1000);
+  return d.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit", second: "2-digit"});
+}
+
+async function load() {
+  const r = await fetch("/api/metrics");
+  const m = await r.json();
+  document.getElementById("m-n").textContent = m.n;
+  document.getElementById("m-abst").textContent = (m.abstention_rate * 100).toFixed(1) + "%";
+  document.getElementById("m-cache").textContent = (m.cache_hit_rate * 100).toFixed(1) + "%";
+  document.getElementById("m-p50").textContent = Math.round(m.p50_ms) + " ms";
+  document.getElementById("m-p95").textContent = Math.round(m.p95_ms) + " ms";
+  document.getElementById("m-cost").textContent = "$" + m.cost_total_usd.toFixed(4);
+  document.getElementById("m-cost-mean").textContent = "$" + (m.cost_mean_usd || 0).toFixed(5);
+
+  const labels = m.series.map((_, i) => i + 1);
+  const latencies = m.series.map(s => s.latency_ms);
+  const costs = m.series.map(s => s.cost_usd);
+
+  const latData = {
+    labels,
+    datasets: [{
+      label: "latency (ms)", data: latencies, borderColor: COL_INDIGO,
+      backgroundColor: ctx => gradient(ctx, COL_INDIGO), fill: true,
+    }],
+  };
+  const costData = {
+    labels,
+    datasets: [{
+      label: "cost (USD)", data: costs, borderColor: COL_TEAL,
+      backgroundColor: ctx => gradient(ctx, COL_TEAL), fill: true,
+    }],
+  };
+
+  if (latencyChart) latencyChart.destroy();
+  if (costChart) costChart.destroy();
+  if (stagesChart) stagesChart.destroy();
+  latencyChart = new Chart(document.getElementById("chart-latency"), {type: "line", data: latData, options: baseLineOpts});
+  costChart    = new Chart(document.getElementById("chart-cost"),    {type: "line", data: costData, options: baseLineOpts});
+
+  const s = m.stages_p95_ms || {};
+  stagesChart = new Chart(document.getElementById("chart-stages"), {
+    type: "bar",
+    data: {
+      labels: ["embed", "retrieve", "rerank", "abstain", "generate"],
+      datasets: [{
+        label: "p95 ms",
+        data: [s.embed, s.retrieve, s.rerank, s.abstain, s.generate].map(v => Math.round(v || 0)),
+        backgroundColor: [COL_INDIGO, COL_INDIGO, COL_AMBER, COL_AMBER, COL_TEAL],
+        borderRadius: 6,
+      }],
+    },
+    options: {
+      ...baseLineOpts,
+      indexAxis: "y",
+      plugins: { legend: { display: false }, tooltip: baseLineOpts.plugins.tooltip },
+      scales: {
+        x: { beginAtZero: true, grid: { color: COL_GRID }, ticks: { color: COL_TEXT } },
+        y: { grid: { display: false }, ticks: { color: COL_TEXT } },
+      },
+    },
+  });
+
+  // Recent events.
+  const tbody = document.getElementById("events-tbody");
+  if (m.series.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="muted">No events yet — ask a few questions.</td></tr>`;
+  } else {
+    const recent = m.series.slice(-12).reverse();
+    tbody.innerHTML = recent.map(s => {
+      const status = s.abstained
+        ? `<span class="pill pill-warn">abstained</span>`
+        : s.cache_hit
+          ? `<span class="pill pill-cache">cache hit</span>`
+          : `<span class="pill pill-ok">answered</span>`;
+      return `<tr>
+        <td class="mono muted">${fmtTs(s.ts)}</td>
+        <td>${status}</td>
+        <td class="mono">${Math.round(s.latency_ms)} ms</td>
+        <td class="mono">$${(s.cost_usd || 0).toFixed(5)}</td>
+      </tr>`;
+    }).join("");
+  }
+}
+
+document.getElementById("refresh").addEventListener("click", () => {
+  load();
+  toast("Refreshed");
+});
+
+load();
+// Auto-refresh every 15s so a live demo updates while you ask questions.
+setInterval(load, 15000);
+</script>
+{% endblock %}
