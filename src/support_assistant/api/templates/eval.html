@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Eval · Support Assistant{% endblock %}
+{% block content %}
+<section class="page eval-page">
+  <header class="page-head">
+    <div>
+      <h1 class="page-title">Evaluation reports</h1>
+      <p class="page-sub">All runs of <code>support-assistant eval</code>, newest first. Click one to view per-case detail.</p>
+    </div>
+    <a class="btn btn-ghost" href="/dashboard">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>
+      <span>Live dashboard</span>
+    </a>
+  </header>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Runs</h2><span class="panel-sub" id="r-count">—</span></div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Config tag</th>
+          <th class="num">Cases</th>
+          <th class="num">Recall@k</th>
+          <th class="num">Abstain acc.</th>
+          <th class="num">Faithfulness</th>
+          <th class="num">p95 ms</th>
+          <th class="num">Cost ($)</th>
+          <th>When</th>
+        </tr>
+      </thead>
+      <tbody id="runs-tbody"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="panel" id="report-detail" hidden>
+    <div class="panel-head">
+      <h2 id="rd-title">Run detail</h2>
+      <button class="btn btn-ghost" id="rd-close">close</button>
+    </div>
+    <div id="rd-summary" class="rd-summary"></div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Case</th><th>Question</th>
+          <th class="num">Recall@k</th>
+          <th>Expected</th>
+          <th>Got</th>
+          <th class="num">Faith.</th>
+          <th class="num">Latency</th>
+        </tr>
+      </thead>
+      <tbody id="rd-cases"></tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <strong>How to populate this page:</strong>
+    <code>support-assistant eval --config baseline</code> generates a report under
+    <code>data/eval_reports/</code>. <code>--sweep-abstain</code> generates a threshold-sweep report.
+    Read DECISIONS.md for what tables to fill in once you have these numbers.
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function fmt(v, d = 3) { return (v === null || v === undefined) ? "—" : Number(v).toFixed(d); }
+function fmtPct(v) { return (v === null || v === undefined) ? "—" : (Number(v) * 100).toFixed(1) + "%"; }
+function fmtTs(ts) { if (!ts) return "—"; return new Date(ts * 1000).toLocaleString(); }
+function esc(s) { return (s || "").replace(/[<>"&]/g, c => ({"<":"&lt;",">":"&gt;","\"":"&quot;","&":"&amp;"}[c])); }
+
+async function loadList() {
+  const r = await fetch("/api/eval/reports");
+  const d = await r.json();
+  const list = d.reports || [];
+  document.getElementById("r-count").textContent = `${list.length} run${list.length === 1 ? "" : "s"}`;
+  const tbody = document.getElementById("runs-tbody");
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" class="muted">No eval runs yet. Run <code>support-assistant eval --config baseline</code> from the CLI.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(r => {
+    if (r.kind === "sweep") {
+      return `<tr class="clickable" data-name="${r.name}">
+        <td><span class="pill pill-cache">sweep</span> ${esc(r.name)}</td>
+        <td class="num mono">${r.n}</td>
+        <td colspan="5" class="muted">threshold sweep</td>
+        <td class="muted">${fmtTs(r.ts)}</td>
+      </tr>`;
+    }
+    return `<tr class="clickable" data-name="${r.name}">
+      <td>${esc(r.config_tag || "(untagged)")}</td>
+      <td class="num mono">${r.n_cases ?? "—"}</td>
+      <td class="num mono">${fmt(r.recall_at_k_mean)}</td>
+      <td class="num mono">${fmt(r.abstention_accuracy)}</td>
+      <td class="num mono">${r.faithfulness_mean === null ? "—" : fmt(r.faithfulness_mean)}</td>
+      <td class="num mono">${Math.round(r.latency_p95_ms || 0)}</td>
+      <td class="num mono">${fmt(r.cost_total_usd, 4)}</td>
+      <td class="muted">${fmtTs(r.ts)}</td>
+    </tr>`;
+  }).join("");
+  tbody.querySelectorAll("tr.clickable").forEach(tr => {
+    tr.addEventListener("click", () => loadDetail(tr.dataset.name));
+  });
+}
+
+async function loadDetail(name) {
+  const r = await fetch(`/api/eval/reports/${encodeURIComponent(name)}`);
+  if (!r.ok) { toast("Failed to load report", "bad"); return; }
+  const data = await r.json();
+  const detail = document.getElementById("report-detail");
+  detail.hidden = false;
+  document.getElementById("rd-title").textContent = name;
+  detail.scrollIntoView({behavior: "smooth", block: "start"});
+
+  if (Array.isArray(data)) {
+    // Sweep report.
+    document.getElementById("rd-summary").innerHTML = `<div class="callout">Threshold sweep — pick a value from this curve.</div>`;
+    const tbody = document.getElementById("rd-cases");
+    tbody.innerHTML = `<tr><th>Threshold</th><th class="num">Accuracy</th><th class="num">Precision (abstain)</th><th class="num">Recall (abstain)</th><th class="num">FP</th><th class="num">FN</th></tr>` +
+      data.map(row => `<tr>
+        <td class="mono">${fmt(row.threshold, 2)}</td>
+        <td class="num mono">${fmt(row.abstention_accuracy)}</td>
+        <td class="num mono">${fmt(row.precision_abstain)}</td>
+        <td class="num mono">${fmt(row.recall_abstain)}</td>
+        <td class="num mono">${row.fp}</td>
+        <td class="num mono">${row.fn}</td>
+      </tr>`).join("");
+    return;
+  }
+
+  const s = data.settings_snapshot || {};
+  document.getElementById("rd-summary").innerHTML = `
+    <div class="rd-cards">
+      <div class="kpi-mini"><div class="kpi-mini-label">cases</div><div class="kpi-mini-value">${data.n_cases || 0}</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">recall@k</div><div class="kpi-mini-value">${fmt(data.recall_at_k_mean)}</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">abstain acc.</div><div class="kpi-mini-value">${fmt((data.abstention || {}).accuracy)}</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">faithfulness</div><div class="kpi-mini-value">${fmt(data.faithfulness_mean)}</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">halluc. rate</div><div class="kpi-mini-value">${fmtPct(data.hallucination_rate)}</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">p95 ms</div><div class="kpi-mini-value">${Math.round(data.latency_p95_ms || 0)}</div></div>
+      <div class="kpi-mini"><div class="kpi-mini-label">cost / run</div><div class="kpi-mini-value">$${fmt(data.cost_total_usd, 4)}</div></div>
+    </div>
+    <div class="rd-settings">
+      <span class="pill">top_k=${s.top_k}</span>
+      <span class="pill">rerank_top_n=${s.rerank_top_n}</span>
+      <span class="pill">rerank=${s.use_reranker ? "on" : "off"}</span>
+      <span class="pill">cache=${s.use_cache ? "on" : "off"}</span>
+      <span class="pill">abstain≥${fmt(s.abstain_min_score, 2)}</span>
+      <span class="pill">judge=${s.abstain_use_judge ? "on" : "off"}</span>
+    </div>`;
+
+  const cases = data.cases || [];
+  const tbody = document.getElementById("rd-cases");
+  tbody.innerHTML = `<tr><th>Case</th><th>Question</th><th class="num">Recall@k</th><th>Expected</th><th>Got</th><th class="num">Faith.</th><th class="num">Latency</th></tr>` +
+    cases.map(c => {
+      const wanted = c.expected_abstain ? "abstain" : "answer";
+      const got = c.did_abstain ? "abstain" : "answer";
+      const ok = wanted === got;
+      return `<tr>
+        <td class="mono">${esc(c.case_id)}</td>
+        <td>${esc(c.question)}</td>
+        <td class="num mono">${fmt(c.recall_at_k)}</td>
+        <td><span class="pill ${c.expected_abstain ? "pill-warn" : "pill-ok"}">${wanted}</span></td>
+        <td><span class="pill ${ok ? "pill-ok" : "pill-bad"}">${got}</span></td>
+        <td class="num mono">${c.faithfulness === null ? "—" : fmt(c.faithfulness)}</td>
+        <td class="num mono">${Math.round(c.latency_ms || 0)}</td>
+      </tr>`;
+    }).join("");
+}
+
+document.getElementById("rd-close").addEventListener("click", () => {
+  document.getElementById("report-detail").hidden = true;
+});
+
+loadList();
+</script>
+{% endblock %}
