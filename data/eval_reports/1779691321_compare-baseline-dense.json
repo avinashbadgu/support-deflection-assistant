@@ -1,0 +1,154 @@
+{
+  "config_tag": "compare-baseline-dense",
+  "n_cases": 5,
+  "recall_at_k_mean": 1.0,
+  "abstention": {
+    "accuracy": 1.0,
+    "precision_abstain": 0.0,
+    "recall_abstain": 0.0,
+    "tp": 0,
+    "tn": 5,
+    "fp": 0,
+    "fn": 0
+  },
+  "faithfulness_mean": null,
+  "hallucination_rate": null,
+  "latency_p50_ms": 7084.17229999759,
+  "latency_p95_ms": 8015.802600001916,
+  "cost_total_usd": 0.0037640699999999996,
+  "cost_mean_usd": 0.0007528139999999999,
+  "settings_snapshot": {
+    "embed_model": "text-embedding-3-small",
+    "gen_model": "gpt-4o-mini",
+    "judge_model": "gpt-4o-mini",
+    "chunk_size": 1000,
+    "chunk_overlap": 200,
+    "top_k": 8,
+    "rerank_top_n": 5,
+    "use_reranker": false,
+    "reranker_kind": "none",
+    "use_cache": true,
+    "use_hybrid": false,
+    "bm25_top_k": 20,
+    "rrf_k": 60,
+    "abstain_min_score": 0.35,
+    "abstain_use_judge": true
+  },
+  "by_category": [
+    {
+      "category": "direct_retrieval",
+      "n": 5,
+      "recall_at_k_mean": 1.0,
+      "abstention_accuracy": 1.0,
+      "faithfulness_mean": null,
+      "latency_p95_ms": 8015.802600001916
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "d001",
+      "category": "direct_retrieval",
+      "question": "How do I issue a partial refund for a charge?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide clear instructions on how to issue a partial refund using the Dashboard, including steps to enter a different refund amount.",
+      "answer": "To issue a partial refund for a charge using the Stripe Dashboard, follow these steps:\n\n1. Find the payment you want to refund in the Payments page.\n2. Click the overflow menu to the right of the payment and select \"Refund payment.\"\n3. By default, a full refund is issued. For a partial refund, enter a different refund amount.\n4. Select a reason for the refund. If you select \"Other,\" you must add a note explaining the reason.\n5. Click \"Refund\" to complete the process.\n\nYou can also issue a partial refund from the payment's details page [2].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/refunds"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 8237.034500001755,
+      "cost_usd": 0.00043877
+    },
+    {
+      "case_id": "d002",
+      "category": "direct_retrieval",
+      "question": "What does a PaymentIntent represent and what are its main statuses?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide information about the PaymentIntent, including its statuses and how they relate to payment outcomes.",
+      "answer": "A PaymentIntent represents a payment attempt in Stripe, encapsulating details about the transaction such as the amount, currency, and supported payment methods. Its main statuses include:\n\n1. **succeeded**: The payment was successful.\n2. **requires_payment_method**: The payment failed due to a card error.\n3. **requires_action**: The payment failed due to authentication issues.\n\nThese statuses affect the corresponding invoice and subscription statuses as well [1], [2], [3].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/billing/subscriptions/overview",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/payments/payment-intents",
+        "https://docs.stripe.com/payments/payment-intents"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 6305.135000002338,
+      "cost_usd": 0.0008710799999999999
+    },
+    {
+      "case_id": "d003",
+      "category": "direct_retrieval",
+      "question": "How does Stripe verify the signature of an incoming webhook?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide detailed information on how to verify the signature of an incoming webhook from Stripe, including the use of endpoint secrets and the Stripe-Signature header.",
+      "answer": "Stripe verifies the signature of an incoming webhook by including a signature in the `Stripe-Signature` header. To confirm that the event wasn't sent or modified by a third party, you can verify this signature using either Stripe's official libraries or manually. The verification process requires the raw body of the request, the signature from the header, and the endpoint's secret. If the verification fails, an error is returned [1][3][5].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks",
+        "https://docs.stripe.com/webhooks"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 7084.17229999759,
+      "cost_usd": 0.0008617799999999999
+    },
+    {
+      "case_id": "d004",
+      "category": "direct_retrieval",
+      "question": "What is Stripe Radar and what does it do?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide a clear overview of Stripe Radar, including its purpose of protecting businesses against fraud, its use of AI algorithms for real-time transaction evaluation, and features like risk settings and automated responses.",
+      "answer": "Stripe Radar is a fraud prevention tool that helps businesses protect against fraudulent transactions. It evaluates transactions in real time using AI algorithms to assess the risk of fraud. Radar can block payments with high risk levels, automate responses to fraud warnings, and allow for customization of fraud interventions through rules and lists of trusted customers. Additionally, it provides analytics to understand fraud patterns and their impact on the business [1], [2], [4], [5].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/radar",
+        "https://docs.stripe.com/radar",
+        "https://docs.stripe.com/radar",
+        "https://docs.stripe.com/testing",
+        "https://docs.stripe.com/radar"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 6762.0016999935615,
+      "cost_usd": 0.00081492
+    },
+    {
+      "case_id": "d005",
+      "category": "direct_retrieval",
+      "question": "How do disputes work on Stripe and what should I do when I receive one?",
+      "expected_abstain": false,
+      "did_abstain": false,
+      "abstain_reason": "judge_yes:The snippets provide relevant information about how disputes work on Stripe, including the process of responding to disputes and the importance of submitting appropriate evidence.",
+      "answer": "Disputes on Stripe occur when a cardholder questions a payment with their card issuer, leading to a chargeback that reverses the payment and debits your balance for the payment amount and any associated fees [2]. \n\nWhen you receive a dispute, you should respond through the Stripe Dashboard, where you can provide relevant text and images to support your case [1]. It's important to submit the best possible response to increase your chances of winning the dispute [1]. If you need assistance, you can contact Stripe support [1].",
+      "retrieved_urls": [
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/disputes",
+        "https://docs.stripe.com/refunds",
+        "https://docs.stripe.com/disputes"
+      ],
+      "recall_at_k": 1.0,
+      "faithfulness": null,
+      "unsupported_claims": [],
+      "latency_ms": 7130.875000002561,
+      "cost_usd": 0.00077752
+    }
+  ]
+}
